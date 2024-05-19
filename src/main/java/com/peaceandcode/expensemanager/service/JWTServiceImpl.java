@@ -4,7 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,12 +15,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
+@Service
 public class JWTServiceImpl implements JWTService{
-  private static final String SECRET_KEY = "741e946218c49b516286785ccd22e7de34ed13cf01cc2c0a3637827dd25dbace";
+  @Value("${jwt.secret}")
+  private static String secretKey;
   @Override
   public SecretKey getSigningKey() {
-    byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+    byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     Key key = Keys.hmacShaKeyFor(keyBytes);
     return new SecretKeySpec(key.getEncoded(),key.getAlgorithm());
   }
