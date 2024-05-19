@@ -24,4 +24,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ExceptionObj> handleResourceNotFound(ResourceNotFound ex, WebRequest request){
     return handleException(HttpStatus.BAD_REQUEST, ex);
   }
+  @ExceptionHandler(SecurityFilterException.class)
+  public ResponseEntity<ExceptionObj> handleSecurityFilterException(SecurityFilterException ex, WebRequest request){
+    return handleException(HttpStatus.UNAUTHORIZED,ex);
+  }
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<ExceptionObj> handleBadRequestException(BadRequestException ex, WebRequest request){
+    return handleException(HttpStatus.BAD_REQUEST,ex);
+  }
+  @ExceptionHandler(AuthenticationFailed.class)
+  public ResponseEntity<ExceptionObj> handleAuthenticationFailed(AuthenticationFailed ex, WebRequest request){
+    return handleException(HttpStatus.UNAUTHORIZED,ex);
+  }
+
 }
