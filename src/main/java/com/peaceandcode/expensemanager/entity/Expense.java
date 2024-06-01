@@ -33,7 +33,6 @@ public class Expense {
   @NotNull(message = "Amount can't be null")
   @Min(value = 1,message = "An expense can't have an amount less than 1")
   private Double amount;
-  @Column(columnDefinition = "BLOB")
   @Lob
   private byte[] receipt;
   @ManyToOne

@@ -20,6 +20,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity
 public class Budget {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -28,8 +29,10 @@ public class Budget {
   @Min(value = 1, message = "Budget amount can't be less than 1")
   private Double amount;
   @NotNull(message = "Budget date start can't be null")
+  @Column(name = "startDate")
   private Date start;
   @NotNull(message = "Budget date end can't be null")
+  @Column(name = "endDate")
   private Date end;
   @ManyToOne
   @JoinColumn(name = "user_id",nullable = false)
