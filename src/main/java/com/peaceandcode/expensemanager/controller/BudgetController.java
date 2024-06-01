@@ -1,2 +1,7 @@
-package com.peaceandcode.expensemanager.controller;public class BudgetController {
+package com.peaceandcode.expensemanager.controller;
+
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BudgetController {
 }

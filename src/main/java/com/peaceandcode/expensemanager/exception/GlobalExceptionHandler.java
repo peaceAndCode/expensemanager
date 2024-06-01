@@ -47,6 +47,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<ExceptionObj> handleAuthenticationFailed(AuthenticationFailed ex, WebRequest request){
     return handleException(HttpStatus.UNAUTHORIZED,ex);
   }
+  @ExceptionHandler(ResourceNotCreated.class)
+  public ResponseEntity<ExceptionObj> handleResourceNotCreated(ResourceNotCreated ex, WebRequest request){
+    return handleException(HttpStatus.BAD_REQUEST,ex);
+  }
 
   @Override
   public ResponseEntity<Object> handleMethodArgumentNotValid(

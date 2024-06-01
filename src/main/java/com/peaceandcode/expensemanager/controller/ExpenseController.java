@@ -1,2 +1,9 @@
-package com.peaceandcode.expensemanager.controller;public class ExpenseController {
+package com.peaceandcode.expensemanager.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class ExpenseController {
 }

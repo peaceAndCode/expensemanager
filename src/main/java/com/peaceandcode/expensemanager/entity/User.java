@@ -25,23 +25,23 @@ public class User implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
-  @NotBlank
+  @NotBlank(message = "Name can't be blank")
   @Pattern(regexp = "^[a-zA-Z]+$", message = "Invalid name")
   private String name;
-  @NotBlank
+  @NotBlank(message = "Surname can't be blank")
   @Pattern(regexp = "^[a-zA-Z]+$", message = "Invalid surname")
   private String surname;
   @Column(unique = true)
-  @NotBlank
+  @NotBlank(message = "Email can't be blank")
   @Email(message = "Invalid email")
   private String email;
   @JsonIgnore
-  @NotBlank
+  @NotBlank(message = "Password can't be blank")
   @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$",message = "invalid password")
   private String password;
-  @NotNull
+  @NotNull(message = "Currency can't be null")
   private Currency currency;
-  @NotNull
+  @NotNull(message = "Role can't be null")
   private Role role;
   @CreationTimestamp
   @Column(name = "created_at")
