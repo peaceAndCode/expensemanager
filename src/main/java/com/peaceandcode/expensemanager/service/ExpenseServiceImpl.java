@@ -5,6 +5,7 @@ import com.peaceandcode.expensemanager.dto.ExpenseDTO;
 import com.peaceandcode.expensemanager.entity.Category;
 import com.peaceandcode.expensemanager.entity.Expense;
 import com.peaceandcode.expensemanager.entity.User;
+import com.peaceandcode.expensemanager.exception.BadRequestException;
 import com.peaceandcode.expensemanager.exception.ResourceNotCreated;
 import com.peaceandcode.expensemanager.exception.ResourceNotFound;
 import com.peaceandcode.expensemanager.repository.CategoryRepository;
@@ -30,13 +31,24 @@ public class ExpenseServiceImpl implements ExpenseService {
     Category category = categoryRepository.findById(expense.getCategoryId())
         .orElseThrow(()-> new ResourceNotFound("Category not found with id: "+expense.getCategoryId()));
 
+    User user = null;
+
+    if(loggedUser.getRole().equals(Role.USER)){
+      user = loggedUser;
+    }else{
+      if(expense.getUserId() == null){
+        throw new BadRequestException("UserId can't be null");
+      }
+      user = userService.getUserById(expense.getUserId());
+    }
+
     Expense newExpense = Expense
       .builder()
       .title(expense.getTitle())
       .description(expense.getDescription())
       .amount(expense.getAmount())
       .receipt(expense.getReceipt())
-      .user(loggedUser)
+      .user(user)
       .category(category)
       .build();
 

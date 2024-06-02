@@ -29,9 +29,8 @@ public class ExpenseDTO {
   @Min(value = 1,message = "An expense can't have an amount less than 1")
   private Double amount;
   private byte[] receipt=null;
-  @NotNull
-  private User user;
+  private  Long userId=null;
   @NotNull(message = "Category can't be null")
-  Long categoryId;
+  private Long categoryId;
 
 }
