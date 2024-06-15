@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,19 +28,19 @@ public class CategoryController {
     List<Category> categories = categoryService.getAllCategories(pageable);
     return new ResponseEntity<>(categories,HttpStatus.OK);
   }
-  @PreAuthorize("hasRole('ADMIN')")
+  @Secured("ADMIN")
   @PostMapping("/categories")
   public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category){
     Category newCategory = categoryService.createCategory(category);
     return new ResponseEntity<>(newCategory,HttpStatus.OK);
   }
-  @PreAuthorize("hasRole('ADMIN')")
+  @Secured("ADMIN")
   @PutMapping("/categories")
   public ResponseEntity<Category> updateCategory(@Valid @RequestBody Category category, @RequestParam Long categoryId){
     Category updatedCategory = categoryService.updateCategory(category,categoryId);
     return new ResponseEntity<>(updatedCategory,HttpStatus.OK);
   }
-  @PreAuthorize("hasRole('ADMIN')")
+  @Secured("ADMIN")
   @DeleteMapping("/categories/{categoryId}")
   public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId){
     categoryService.deleteCategory(categoryId);

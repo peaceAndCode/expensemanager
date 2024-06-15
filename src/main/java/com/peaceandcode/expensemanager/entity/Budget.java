@@ -20,10 +20,11 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
+@Entity(name = "tbl_budget")
 public class Budget {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "budget_sequence")
+  @SequenceGenerator(name = "budget_sequence",sequenceName = "budget_sequence",allocationSize = 1)
   private Long id;
   @NotNull(message = "Budget amount can't be null")
   @Min(value = 1, message = "Budget amount can't be less than 1")

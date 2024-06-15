@@ -24,7 +24,8 @@ import java.sql.Timestamp;
 @Entity(name = "tbl_expense")
 public class Expense {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "expense_sequence")
+  @SequenceGenerator(name = "expense_sequence",sequenceName = "expense_sequence",allocationSize = 1)
   private Long id;
   @NotBlank(message = "Title can't be blank")
   @Size(min = 2, max = 60,message = "The title must be between 2 and 60 characters")

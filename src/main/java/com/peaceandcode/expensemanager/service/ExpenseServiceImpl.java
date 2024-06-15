@@ -108,15 +108,18 @@ public class ExpenseServiceImpl implements ExpenseService {
   @Override
   public Expense updateExpense(ExpenseDTO updatedExpense, Long expenseId) {
     User loggedUser = userService.getLoggedUserDetail();
+    User user = null;
     Category category = categoryRepository.findById(updatedExpense.getCategoryId())
       .orElseThrow(()-> new ResourceNotFound("Category not found with id: "+updatedExpense.getCategoryId()));
 
     Expense expense = null;
 
     if(loggedUser.getRole().equals(Role.USER)){
+      user = loggedUser;
       expense = expenseRepository.findByIdAndUserId(expenseId, loggedUser.getId())
         .orElseThrow(() -> new ResourceNotFound("Expense not found with id: "+expenseId+" and user id: "+loggedUser.getId()));
     }else{
+      user = userService.getUserById(updatedExpense.getUserId());
       expense = expenseRepository.findById(expenseId)
         .orElseThrow(()-> new ResourceNotFound("Expense not found with id: "+expenseId));
     }
@@ -135,6 +138,7 @@ public class ExpenseServiceImpl implements ExpenseService {
       .description(description)
       .amount(amount)
       .receipt(receipt)
+      .user(user)
       .category(categoryToSet)
       .build();
 

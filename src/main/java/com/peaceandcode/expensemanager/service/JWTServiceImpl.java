@@ -4,7 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +20,11 @@ import java.util.Map;
 import java.util.function.Function;
 @Service
 public class JWTServiceImpl implements JWTService{
-  @Value("${jwt.secret}")
-  private static String secretKey;
+  private final String secretKey;
+
+  public JWTServiceImpl(@Value("${jwt.secret}") String secretKey) {
+    this.secretKey = secretKey;
+  }
   @Override
   public SecretKey getSigningKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -52,7 +58,7 @@ public class JWTServiceImpl implements JWTService{
       .builder()
       .claims(extraClaims)
       .issuedAt(new Date(System.currentTimeMillis()))
-      .expiration(new Date(System.currentTimeMillis()))
+      .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
       .subject(userDetails.getUsername())
       .signWith(getSigningKey())
       .compact();

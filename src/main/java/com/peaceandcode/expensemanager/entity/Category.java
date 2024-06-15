@@ -15,13 +15,14 @@ import java.sql.Timestamp;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "tbl_category")
 public class Category {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "category_sequence")
+  @SequenceGenerator(name = "category_sequence",sequenceName = "category_sequence",allocationSize = 1)
   private Long id;
   @NotBlank(message = "Category name can't be blank")
-  @Pattern(regexp = "^[a-zA-Z]+$", message = "Category name")
+  @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Invalid category name")
   private String name;
   @CreationTimestamp
   @Column(name = "created_at")

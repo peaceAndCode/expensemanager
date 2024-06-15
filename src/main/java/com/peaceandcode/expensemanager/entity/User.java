@@ -23,7 +23,8 @@ import java.util.List;
 @Builder
 public class User implements UserDetails {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "user_sequence")
+  @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
   private Long id;
   @NotBlank(message = "Name can't be blank")
   @Pattern(regexp = "^[a-zA-Z]+$", message = "Invalid name")

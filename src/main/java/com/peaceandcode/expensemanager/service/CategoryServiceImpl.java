@@ -48,9 +48,8 @@ public class CategoryServiceImpl implements CategoryService{
       : category.getName();
 
     categoryToUpdate.setName(name);
-    categoryRepository.save(categoryToUpdate);
+    return categoryRepository.save(categoryToUpdate);
 
-    return null;
   }
 
   @Override
