@@ -7,6 +7,7 @@ import com.peaceandcode.expensemanager.dto.UserRegisterDTO;
 import com.peaceandcode.expensemanager.entity.User;
 import com.peaceandcode.expensemanager.exception.AuthenticationFailed;
 import com.peaceandcode.expensemanager.exception.BadRequestException;
+import com.peaceandcode.expensemanager.mapper.UserMapper;
 import com.peaceandcode.expensemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,20 +23,14 @@ import java.util.Map;
 public class AuthenticationServiceImpl implements AuthenticationService{
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final UserMapper userMapper;
   private final JWTService jwtService;
   private final AuthenticationManager authenticationManager;
   @Override
   public AuthenticationDTO register(UserRegisterDTO user) {
-    //TODO Replace with UserMapper
-    User newUser = User
-      .builder()
-      .name(user.getName())
-      .surname(user.getSurname())
-      .email(user.getEmail())
-      .password(passwordEncoder.encode(user.getPassword()))
-      .currency(user.getCurrency())
-      .role(Role.USER)
-      .build();
+    User newUser = userMapper.entity(user);
+    newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+    newUser.setRole(Role.USER);
 
     if(user.getEmail().equals(newUser.getEmail())){
       throw new BadRequestException("Username already exists");

@@ -70,14 +70,10 @@ public class BudgetServiceImpl implements BudgetService{
 
     Category category = categoryService.getCategory(budget.getCategoryId());
 
-    Budget budgetToSave = Budget
-      .builder()
-      .start(budget.getStart())
-      .end(budget.getEnd())
-      .amount(budget.getAmount())
-      .user(user)
-      .category(category)
-      .build();
+    Budget budgetToSave = budgetMapper.entity(budget);
+    budgetToSave.setUser(user);
+    budgetToSave.setCategory(category);
+
 
     budgetRepository.save(budgetToSave);
 
@@ -119,15 +115,15 @@ public class BudgetServiceImpl implements BudgetService{
     currentBudget.setCategory(category);
     currentBudget.setUser(user);
 
-    currentBudget = Budget
-            .builder()
-            .id(currentBudget.getId())
-            .start(start)
-            .end(end)
-            .amount(amount)
-            .category(category)
-            .user(user)
-            .build();
+   currentBudget = Budget
+    .builder()
+    .id(currentBudget.getId())
+    .start(start)
+    .end(end)
+    .amount(amount)
+    .category(category)
+    .user(user)
+    .build();
 
     budgetRepository.save(currentBudget);
 
