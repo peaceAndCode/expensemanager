@@ -26,6 +26,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
   private final AuthenticationManager authenticationManager;
   @Override
   public AuthenticationDTO register(UserRegisterDTO user) {
+    //TODO Replace with UserMapper
     User newUser = User
       .builder()
       .name(user.getName())

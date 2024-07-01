@@ -16,8 +16,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 @Data
 public class BudgetDTO {
-  @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
   @NotNull(message = "Budget amount can't be null")
   @Min(value = 1, message = "Budget amount can't be less than 1")

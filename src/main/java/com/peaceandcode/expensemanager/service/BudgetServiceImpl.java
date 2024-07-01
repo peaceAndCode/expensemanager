@@ -8,6 +8,7 @@ import com.peaceandcode.expensemanager.entity.User;
 import com.peaceandcode.expensemanager.exception.BadRequestException;
 import com.peaceandcode.expensemanager.exception.ResourceNotCreated;
 import com.peaceandcode.expensemanager.exception.ResourceNotFound;
+import com.peaceandcode.expensemanager.mapper.BudgetMapper;
 import com.peaceandcode.expensemanager.repository.BudgetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,25 +25,33 @@ public class BudgetServiceImpl implements BudgetService{
   private final BudgetRepository budgetRepository;
   private final UserService userService;
   private final CategoryService categoryService;
+  private final BudgetMapper budgetMapper;
   @Override
-  public Budget getBudget(Long id) {
-    return budgetRepository.findById(id)
-      .orElseThrow(()-> new ResourceNotFound("Budget not found with id: "+id));
+  public BudgetDTO getBudget(Long id) {
+    Budget budget = budgetRepository.findById(id)
+            .orElseThrow(()-> new ResourceNotFound("Budget not found with id: "+id));
+    return budgetMapper.dto(budget);
   }
 
   @Override
-  public List<Budget> getAllBudgets(Pageable pageable) {
-    return budgetRepository.findAll(pageable).toList();
+  public List<BudgetDTO> getAllBudgets(Pageable pageable) {
+    return budgetRepository
+            .findAll(pageable)
+            .stream()
+            .map(budgetMapper::dto)
+            .toList();
   }
 
   @Override
-  public Budget getBudgetByUserIdAndCategoryId(Long userId, Long categoryId) {
-    return budgetRepository.findBudgetByUserIdAndCategoryId(userId,categoryId)
-      .orElseThrow(()->new ResourceNotFound("Budget not found with userId "+userId+" and categoryId: "+categoryId));
+  public BudgetDTO getBudgetByUserIdAndCategoryId(Long userId, Long categoryId) {
+    Budget budget = budgetRepository.findBudgetByUserIdAndCategoryId(userId,categoryId)
+            .orElseThrow(()->new ResourceNotFound("Budget not found with userId "+userId+" and categoryId: "+categoryId));
+
+    return budgetMapper.dto(budget);
   }
 
   @Override
-  public Budget createBudget(BudgetDTO budget) {
+  public BudgetDTO createBudget(BudgetDTO budget) {
     User loggedUser = userService.getLoggedUserDetail();
     Long userId = null;
 
@@ -73,20 +82,22 @@ public class BudgetServiceImpl implements BudgetService{
     budgetRepository.save(budgetToSave);
 
     if(budgetToSave.getId() != null){
-      return budgetToSave;
+      return budgetMapper.dto(budgetToSave);
     }else{
       throw new ResourceNotCreated("Failed to create new Budget");
     }
   }
 
   @Override
-  public Budget updateBudget(BudgetDTO budget, Long id) {
+  public BudgetDTO updateBudget(BudgetDTO budget, Long id) {
     User loggedUser = userService.getLoggedUserDetail();
-    Budget currentBudget = getBudget(id);
+    Budget currentBudget = budgetRepository.findById(budget.getId())
+            .orElseThrow(()-> new ResourceNotFound("Budget not found with id: "+id));
+
     Date start = Objects.equals(currentBudget.getStart(),budget.getStart()) ? currentBudget.getStart() : budget.getStart();
     Date end = Objects.equals(currentBudget.getEnd(),budget.getEnd()) ? currentBudget.getEnd() : budget.getEnd();
     Double amount = Objects.equals(currentBudget.getAmount(),budget.getAmount()) ? currentBudget.getAmount() : budget.getAmount();
-   Category category = Objects.equals(currentBudget.getCategory().getId(), budget.getCategoryId()) ? currentBudget.getCategory() : categoryService.getCategory(budget.getCategoryId());
+    Category category = Objects.equals(currentBudget.getCategory().getId(), budget.getCategoryId()) ? currentBudget.getCategory() : categoryService.getCategory(budget.getCategoryId());
     Long userId = null;
 
     if(loggedUser.getRole().equals(Role.USER)){
@@ -102,19 +113,26 @@ public class BudgetServiceImpl implements BudgetService{
     User user = !Objects.equals(userId, loggedUser.getId())
       ? userService.getUserById(userId) : loggedUser;
 
+    currentBudget.setStart(start);
+    currentBudget.setEnd(end);
+    currentBudget.setAmount(amount);
+    currentBudget.setCategory(category);
+    currentBudget.setUser(user);
+
     currentBudget = Budget
-      .builder()
-      .start(start)
-      .end(end)
-      .amount(amount)
-      .category(category)
-      .user(user)
-      .build();
+            .builder()
+            .id(currentBudget.getId())
+            .start(start)
+            .end(end)
+            .amount(amount)
+            .category(category)
+            .user(user)
+            .build();
 
     budgetRepository.save(currentBudget);
 
     if(currentBudget.getId() != null){
-      return currentBudget;
+      return budgetMapper.dto(currentBudget);
     }else{
       throw new ResourceNotCreated("Failed to create new Budget");
     }

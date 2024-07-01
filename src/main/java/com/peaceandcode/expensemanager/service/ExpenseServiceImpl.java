@@ -8,6 +8,8 @@ import com.peaceandcode.expensemanager.entity.User;
 import com.peaceandcode.expensemanager.exception.BadRequestException;
 import com.peaceandcode.expensemanager.exception.ResourceNotCreated;
 import com.peaceandcode.expensemanager.exception.ResourceNotFound;
+import com.peaceandcode.expensemanager.mapper.BudgetMapper;
+import com.peaceandcode.expensemanager.mapper.ExpenseMapper;
 import com.peaceandcode.expensemanager.repository.CategoryRepository;
 import com.peaceandcode.expensemanager.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +19,17 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ExpenseServiceImpl implements ExpenseService {
   private final ExpenseRepository expenseRepository;
   private final UserService userService;
+  private final BudgetMapper budgetMapper;
+  private final ExpenseMapper expenseMapper;
   private final CategoryRepository categoryRepository;
   @Override
-  public Expense createExpense(ExpenseDTO expense) {
+  public ExpenseDTO createExpense(ExpenseDTO expense) {
     User loggedUser = userService.getLoggedUserDetail();
     Category category = categoryRepository.findById(expense.getCategoryId())
         .orElseThrow(()-> new ResourceNotFound("Category not found with id: "+expense.getCategoryId()));
@@ -42,27 +45,22 @@ public class ExpenseServiceImpl implements ExpenseService {
       user = userService.getUserById(expense.getUserId());
     }
 
-    Expense newExpense = Expense
-      .builder()
-      .title(expense.getTitle())
-      .description(expense.getDescription())
-      .amount(expense.getAmount())
-      .receipt(expense.getReceipt())
-      .user(user)
-      .category(category)
-      .build();
+    Expense newExpense = expenseMapper.entity(expense);
+    newExpense.setUser(user);
+    newExpense.setCategory(category);
 
     Expense expenseCreated = expenseRepository.save(newExpense);
 
     if(expenseCreated.getId()!= null){
-      return expenseCreated;
+      expense.setId(newExpense.getId());
+      return expense;
     }
 
     throw new ResourceNotCreated("Failed to create new Expense");
   }
 
   @Override
-  public List<Expense> getAllExpenses(Pageable pageable) {
+  public List<ExpenseDTO> getAllExpenses(Pageable pageable) {
     User loggedUser = userService.getLoggedUserDetail();
 
     List<Expense> expenseList = null;
@@ -74,11 +72,14 @@ public class ExpenseServiceImpl implements ExpenseService {
       expenseList = expenseRepository.findAll();
     }
 
-    return expenseList;
+    return expenseList
+            .stream()
+            .map(expenseMapper::dto)
+            .toList();
   }
 
   @Override
-  public List<Expense> getAllExpensesByCategory(Long categoryId,Pageable pageable) {
+  public List<ExpenseDTO> getAllExpensesByCategory(Long categoryId,Pageable pageable) {
     User loggedUser =  userService.getLoggedUserDetail();
 
     List<Expense> expenseList = null;
@@ -89,11 +90,14 @@ public class ExpenseServiceImpl implements ExpenseService {
       expenseList = expenseRepository.findByCategoryId(categoryId,pageable).toList();
     }
 
-    return expenseList;
+    return expenseList
+            .stream()
+            .map(expenseMapper::dto)
+            .toList();
   }
 
   @Override
-  public Expense getExpenseById(Long expenseId) {
+  public ExpenseDTO getExpenseById(Long expenseId) {
     User loggedUser = userService.getLoggedUserDetail();
 
     Expense expense = expenseRepository.findById(expenseId)
@@ -102,11 +106,11 @@ public class ExpenseServiceImpl implements ExpenseService {
     if(!Objects.equals(expense.getUser().getId(), loggedUser.getId())){
       throw new ResourceNotFound("Expense not found with id: "+expenseId+ " and userId: "+loggedUser.getId());
     }
-    return expense;
+    return expenseMapper.dto(expense);
   }
 
   @Override
-  public Expense updateExpense(ExpenseDTO updatedExpense, Long expenseId) {
+  public ExpenseDTO updateExpense(ExpenseDTO updatedExpense, Long expenseId) {
     User loggedUser = userService.getLoggedUserDetail();
     User user = null;
     Category category = categoryRepository.findById(updatedExpense.getCategoryId())
@@ -134,6 +138,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     expense = Expense
       .builder()
+      .id(expenseId)
       .title(title)
       .description(description)
       .amount(amount)
@@ -142,7 +147,7 @@ public class ExpenseServiceImpl implements ExpenseService {
       .category(categoryToSet)
       .build();
 
-    return expenseRepository.save(expense);
+    return expenseMapper.dto(expenseRepository.save(expense));
 
   }
 

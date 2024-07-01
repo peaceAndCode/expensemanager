@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpenseDTO {
+  Long id = null;
   @NotBlank(message = "Title can't be blank")
   @Size(min = 2, max = 60,message = "The title must be between 2 and 60 characters")
   private String title;

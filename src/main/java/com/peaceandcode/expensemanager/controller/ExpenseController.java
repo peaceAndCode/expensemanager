@@ -18,14 +18,13 @@ import java.util.List;
 public class ExpenseController {
   private final ExpenseService expenseService;
   @PostMapping("/expenses")
-  public ResponseEntity<Expense> createExpense(@Valid @RequestBody ExpenseDTO expenseDTO){
-    Expense newExpense = expenseService.createExpense(expenseDTO);
-    return new ResponseEntity<>(newExpense,HttpStatus.CREATED);
+  public ResponseEntity<ExpenseDTO> createExpense(@Valid @RequestBody ExpenseDTO expenseDTO){
+    return new ResponseEntity<>(expenseService.createExpense(expenseDTO),HttpStatus.CREATED);
   }
   @GetMapping("/expenses")
   @Transactional
-  public ResponseEntity<List<Expense>> getAllExpenses(@RequestParam(required = false) Long ctaegoryId, Pageable pageable){
-    List<Expense> expenses = ctaegoryId == null
+  public ResponseEntity<List<ExpenseDTO>> getAllExpenses(@RequestParam(required = false) Long ctaegoryId, Pageable pageable){
+    List<ExpenseDTO> expenses = ctaegoryId == null
       ? expenseService.getAllExpenses(pageable)
       : expenseService.getAllExpensesByCategory(ctaegoryId,pageable);
 
@@ -33,13 +32,13 @@ public class ExpenseController {
   }
   @GetMapping("/expenses/{expenseId}")
   @Transactional
-  public ResponseEntity<Expense> getExpenseById(@PathVariable Long expenseId){
-    Expense expense = expenseService.getExpenseById(expenseId);
+  public ResponseEntity<ExpenseDTO> getExpenseById(@PathVariable Long expenseId){
+    ExpenseDTO expense = expenseService.getExpenseById(expenseId);
     return new ResponseEntity<>(expense,HttpStatus.OK);
   }
   @PutMapping("/expenses")
-  public ResponseEntity<Expense> updateExpense(@RequestParam Long expenseId, @Valid @RequestBody ExpenseDTO expenseDTO){
-    Expense updateExpense = expenseService.updateExpense(expenseDTO,expenseId);
+  public ResponseEntity<ExpenseDTO> updateExpense(@RequestParam Long expenseId, @Valid @RequestBody ExpenseDTO expenseDTO){
+    ExpenseDTO updateExpense = expenseService.updateExpense(expenseDTO,expenseId);
     return new ResponseEntity<>(updateExpense,HttpStatus.OK);
   }
   @DeleteMapping("/expenses")
