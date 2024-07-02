@@ -9,6 +9,7 @@ import com.peaceandcode.expensemanager.exception.BadRequestException;
 import com.peaceandcode.expensemanager.exception.ResourceNotCreated;
 import com.peaceandcode.expensemanager.exception.ResourceNotFound;
 import com.peaceandcode.expensemanager.mapper.BudgetMapper;
+import com.peaceandcode.expensemanager.mapper.CategoryMapper;
 import com.peaceandcode.expensemanager.repository.BudgetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class BudgetServiceImpl implements BudgetService{
   private final UserService userService;
   private final CategoryService categoryService;
   private final BudgetMapper budgetMapper;
+  private final CategoryMapper categoryMapper;
   @Override
   public BudgetDTO getBudget(Long id) {
     Budget budget = budgetRepository.findById(id)
@@ -68,7 +70,7 @@ public class BudgetServiceImpl implements BudgetService{
     User user = !Objects.equals(userId, loggedUser.getId())
       ? userService.getUserById(userId) : loggedUser;
 
-    Category category = categoryService.getCategory(budget.getCategoryId());
+    Category category = categoryMapper.entity(categoryService.getCategory(budget.getCategoryId()));
 
     Budget budgetToSave = budgetMapper.entity(budget);
     budgetToSave.setUser(user);
@@ -93,7 +95,7 @@ public class BudgetServiceImpl implements BudgetService{
     Date start = Objects.equals(currentBudget.getStart(),budget.getStart()) ? currentBudget.getStart() : budget.getStart();
     Date end = Objects.equals(currentBudget.getEnd(),budget.getEnd()) ? currentBudget.getEnd() : budget.getEnd();
     Double amount = Objects.equals(currentBudget.getAmount(),budget.getAmount()) ? currentBudget.getAmount() : budget.getAmount();
-    Category category = Objects.equals(currentBudget.getCategory().getId(), budget.getCategoryId()) ? currentBudget.getCategory() : categoryService.getCategory(budget.getCategoryId());
+    Category category = Objects.equals(currentBudget.getCategory().getId(), budget.getCategoryId()) ? currentBudget.getCategory() : categoryMapper.entity(categoryService.getCategory(budget.getCategoryId()));
     Long userId = null;
 
     if(loggedUser.getRole().equals(Role.USER)){
