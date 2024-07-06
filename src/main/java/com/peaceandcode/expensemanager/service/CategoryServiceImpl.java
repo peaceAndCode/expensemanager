@@ -1,8 +1,10 @@
 package com.peaceandcode.expensemanager.service;
 
+import com.peaceandcode.expensemanager.dto.CategoryDTO;
 import com.peaceandcode.expensemanager.entity.Category;
 import com.peaceandcode.expensemanager.exception.ResourceNotCreated;
 import com.peaceandcode.expensemanager.exception.ResourceNotFound;
+import com.peaceandcode.expensemanager.mapper.CategoryMapper;
 import com.peaceandcode.expensemanager.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,23 +17,31 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService{
   private final CategoryRepository categoryRepository;
+  private final CategoryMapper categoryMapper;
+
   @Override
-  public Category getCategory(Long id) {
-    return categoryRepository.findById(id)
+  public CategoryDTO getCategory(Long id) {
+    Category category = categoryRepository.findById(id)
       .orElseThrow(()-> new ResourceNotFound("Category not found with id: "+id));
+
+    return categoryMapper.dto(category);
   }
 
   @Override
-  public List<Category> getAllCategories(Pageable pageable) {
-    return categoryRepository.findAll(pageable).toList();
+  public List<CategoryDTO> getAllCategories(Pageable pageable) {
+    return categoryRepository
+            .findAll(pageable)
+            .stream()
+            .map(categoryMapper::dto)
+            .toList();
   }
 
   @Override
-  public Category createCategory(Category category) {
+  public CategoryDTO createCategory(Category category) {
     Category categorySaved = categoryRepository.save(category);
 
     if(categorySaved.getId() != null){
-      return categorySaved;
+      return categoryMapper.dto(categorySaved);
     }else{
       throw new ResourceNotCreated("Failed to create new category");
     }
@@ -39,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService{
   }
 
   @Override
-  public Category updateCategory(Category category, Long id) {
+  public CategoryDTO updateCategory(Category category, Long id) {
     Category categoryToUpdate = categoryRepository.findById(id)
       .orElseThrow(()-> new ResourceNotFound("Category not found with id: "+id));
 
@@ -49,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     categoryToUpdate.setName(name);
 
-    return categoryRepository.save(categoryToUpdate);
+    return categoryMapper.dto(categoryRepository.save(categoryToUpdate));
 
   }
 
