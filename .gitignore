@@ -34,3 +34,7 @@ build/
 
 ### Config files ###
 src/main/resources/application.properties
+main/java/com/peaceandcode/expensemanager/config/ApplicationConfig.java
+js/node_modules/
+js/package-lock.json
+
