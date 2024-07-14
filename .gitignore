@@ -32,13 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
-### Config files ###
-src/main/resources/application.properties
-main/java/com/peaceandcode/expensemanager/config/ApplicationConfig.java
-js/node_modules/
-js/package-lock.json
+### Config files, node modules, package-lock###
 
 /src/js/node_modules
 src/js/package-lock.json
 src/js/README.md
 src/main/java/com/peaceandcode/expensemanager/config/ApplicationConfig.java
+src/main/resources/application.properties
