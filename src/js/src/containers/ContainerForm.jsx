@@ -2,11 +2,13 @@ import {Container} from "@mui/material";
 
 import React from 'react';
 import styled from "styled-components";
+import {Footer} from "../components";
 
 const ContainerForm = ({children}) => {
     return (
-        <ContainerCustom maxWidth="sm">
+        <ContainerCustom maxWidth="md">
             {children}
+            <Footer/>
         </ContainerCustom>
     );
 };
