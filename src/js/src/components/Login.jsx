@@ -1,10 +1,12 @@
 import React from 'react';
-import styled from "styled-components";
-import {Box, Button, Container, TextField} from "@mui/material";
+import {Box, Button, TextField, Typography} from "@mui/material";
 import expenseManagerLogo from "../assets/expensemanager-logo.svg"
+import {Link} from "react-router-dom";
+import {ContainerForm} from "../containers";
+
 const Login = () => {
     return (
-        <ContainerForm maxWidth="sm">
+        <ContainerForm>
             <div>
                 <img src={expenseManagerLogo} alt="expense manager logo"/>
             </div>
@@ -16,38 +18,15 @@ const Login = () => {
                     <TextField type="password" label="Password" variant="filled"/>
                 </div>
             </Box>
+            <div className="signup-link-container">
+                <Typography variant="subtitle1" component="p">
+                    You don't have an account yet? <Link to="/signup">Sign up</Link>
+                </Typography>
+            </div>
             <Button variant="contained">
                 Sign in
             </Button>
         </ContainerForm>
     );
 };
-
-const ContainerForm = styled(Container)`
-    margin-top: 8rem;
-    margin-bottom: 8rem;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    & div img{
-        margin-bottom: 2rem;
-        height: 200px;
-        width: 100%;
-    }
-    & form div .MuiTextField-root{
-        width: 100%;
-    }
-    
-    & form{
-        margin-bottom: 2rem;
-    }
-    
-    & button {
-        width: 100%;
-    }
-`
-
 export default Login;
