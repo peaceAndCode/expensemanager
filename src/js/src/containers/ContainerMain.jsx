@@ -26,6 +26,7 @@ const ContainerCustom = styled(Container)`
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    min-height: 300px;
 `
 
 export default ContainerMain;

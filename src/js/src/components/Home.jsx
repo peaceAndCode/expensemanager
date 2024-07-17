@@ -1,10 +1,13 @@
 import React from 'react';
 import {ContainerMain} from "../containers";
+import FormFilter from "./FormFilter";
+import ExpenseContainer from "./ExpenseContainer";
 
 const Home = () => {
     return (
         <ContainerMain>
-            <h1>Home Page</h1>
+            <FormFilter/>
+            <ExpenseContainer/>
         </ContainerMain>
     );
 };
