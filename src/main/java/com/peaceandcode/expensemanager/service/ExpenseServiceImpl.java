@@ -1,5 +1,6 @@
 package com.peaceandcode.expensemanager.service;
 
+import com.peaceandcode.expensemanager.constant.OrderingType;
 import com.peaceandcode.expensemanager.constant.Role;
 import com.peaceandcode.expensemanager.dto.ExpenseDTO;
 import com.peaceandcode.expensemanager.entity.Category;
@@ -60,41 +61,163 @@ public class ExpenseServiceImpl implements ExpenseService {
   }
 
   @Override
-  public List<ExpenseDTO> getAllExpenses(Pageable pageable) {
+  public List<ExpenseDTO> getAllExpenses(Pageable pageable, OrderingType dateFilter, OrderingType priceFilter) {
     User loggedUser = userService.getLoggedUserDetail();
 
-    List<Expense> expenseList = null;
-
-    //Admin must see all expenses of all users
-    if(loggedUser.getRole().equals(Role.USER)){
-      expenseList = expenseRepository.findByUserId(loggedUser.getId(),pageable).toList();
-    }else{
-      expenseList = expenseRepository.findAll();
-    }
+    List<Expense> expenseList = getSortedExpensesList(dateFilter,priceFilter,pageable,loggedUser);
 
     return expenseList
             .stream()
             .map(expenseMapper::dto)
             .toList();
+  }
+
+  private List<Expense> getSortedExpensesList(OrderingType dateFilter, OrderingType priceFilter, Pageable pageable, User loggedUser){
+    List<Expense> expenseList = null;
+    //Admin must see all expenses of all users
+    if(dateFilter == null && priceFilter == null){
+      if(loggedUser.getRole().equals(Role.USER)){
+        expenseList = expenseRepository.findByUserIdOrderByCreatedAtDescCategoryAsc(loggedUser.getId(),pageable).toList();
+      }else{
+        expenseList = expenseRepository.findByOrderByCreatedAtDescCategoryAsc(pageable).toList();
+      }
+    }else if(dateFilter == null && priceFilter != null){
+      if(priceFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtDescCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtDescCategoryAscAmountAsc(pageable).toList();
+        }
+      }else{
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtDescCategoryAscAmountDesc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtDescCategoryAscAmountDesc(pageable).toList();
+        }
+      }
+    }else if(dateFilter != null && priceFilter == null){
+      if(dateFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtAscCategoryAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtAscCategoryAsc(pageable).toList();
+        }
+      }else{
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtDescCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtDescCategoryAscAmountAsc(pageable).toList();
+        }
+      }
+    }else{
+      if(dateFilter.equals(OrderingType.ASC) && priceFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtAscCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtAscCategoryAscAmountAsc(pageable).toList();
+        }
+      }else if(dateFilter.equals(OrderingType.ASC) && priceFilter.equals(OrderingType.DESC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtAscCategoryAscAmountDesc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtAscCategoryAscAmountDesc(pageable).toList();
+        }
+      }else if(dateFilter.equals(OrderingType.DESC) && priceFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtDescCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtDescCategoryAscAmountAsc(pageable).toList();
+        }
+      }else{
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdOrderByCreatedAtDescCategoryAscAmountDesc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByOrderByCreatedAtDescCategoryAscAmountDesc(pageable).toList();
+        }
+      }
+    }
+    return expenseList;
   }
 
   @Override
-  public List<ExpenseDTO> getAllExpensesByCategory(Long categoryId,Pageable pageable) {
+  public List<ExpenseDTO> getAllExpensesByCategory(Long categoryId, OrderingType dateFilter, OrderingType priceFilter, Pageable pageable) {
     User loggedUser =  userService.getLoggedUserDetail();
 
-    List<Expense> expenseList = null;
-
-    if(loggedUser.getRole().equals(Role.USER)){
-      expenseList = expenseRepository.findByUserIdAndCategoryId(loggedUser.getId(), categoryId, pageable).toList();
-    }else{
-      expenseList = expenseRepository.findByCategoryId(categoryId,pageable).toList();
-    }
+    List<Expense> expenseList = getSortedExpensesListByCategory(dateFilter,priceFilter,pageable,loggedUser);
 
     return expenseList
             .stream()
             .map(expenseMapper::dto)
             .toList();
   }
+
+  private List<Expense> getSortedExpensesListByCategory(OrderingType dateFilter, OrderingType priceFilter, Pageable pageable, User loggedUser){
+    List<Expense> expenseList = null;
+    //Admin must see all expenses of all users
+    if(dateFilter == null && priceFilter == null){
+      if(loggedUser.getRole().equals(Role.USER)){
+        expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtDescCategoryAsc(loggedUser.getId(),pageable).toList();
+      }else{
+        expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtDescCategoryAsc(pageable).toList();
+      }
+    }else if(dateFilter == null && priceFilter != null){
+      if(priceFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtDescCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtDescCategoryAscAmountAsc(pageable).toList();
+        }
+      }else{
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtDescCategoryAscAmountDesc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtDescCategoryAscAmountDesc(pageable).toList();
+        }
+      }
+    }else if(dateFilter != null && priceFilter == null){
+      if(dateFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtAscCategoryAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtAscCategoryAsc(pageable).toList();
+        }
+      }else{
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtDescCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtDescCategoryAscAmountAsc(pageable).toList();
+        }
+      }
+    }else{
+      if(dateFilter.equals(OrderingType.ASC) && priceFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtAscCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtAscCategoryAscAmountAsc(pageable).toList();
+        }
+      }else if(dateFilter.equals(OrderingType.ASC) && priceFilter.equals(OrderingType.DESC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtAscCategoryAscAmountDesc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtAscCategoryAscAmountDesc(pageable).toList();
+        }
+      }else if(dateFilter.equals(OrderingType.DESC) && priceFilter.equals(OrderingType.ASC)){
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtDescCategoryAscAmountAsc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtDescCategoryAscAmountAsc(pageable).toList();
+        }
+      }else{
+        if(loggedUser.getRole().equals(Role.USER)){
+          expenseList = expenseRepository.findByUserIdAndCategoryIdOrderByCreatedAtDescCategoryAscAmountDesc(loggedUser.getId(),pageable).toList();
+        }else{
+          expenseList = expenseRepository.findByCategoryIdOrderByCreatedAtDescCategoryAscAmountDesc(pageable).toList();
+        }
+      }
+    }
+    return expenseList;
+  }
+
 
   @Override
   public ExpenseDTO getExpenseById(Long expenseId) {
@@ -103,7 +226,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     Expense expense = expenseRepository.findById(expenseId)
       .orElseThrow(() -> new ResourceNotFound("Expense not found with id: "+expenseId));
 
-    if(!Objects.equals(expense.getUser().getId(), loggedUser.getId())){
+    if(loggedUser.getRole().equals(Role.USER) && !Objects.equals(expense.getUser().getId(), loggedUser.getId())){
       throw new ResourceNotFound("Expense not found with id: "+expenseId+ " and userId: "+loggedUser.getId());
     }
     return expenseMapper.dto(expense);

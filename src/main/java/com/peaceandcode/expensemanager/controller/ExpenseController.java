@@ -1,11 +1,12 @@
 package com.peaceandcode.expensemanager.controller;
 
+import com.peaceandcode.expensemanager.constant.OrderingType;
 import com.peaceandcode.expensemanager.dto.ExpenseDTO;
-import com.peaceandcode.expensemanager.entity.Expense;
 import com.peaceandcode.expensemanager.service.ExpenseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +24,16 @@ public class ExpenseController {
   }
   @GetMapping("/expenses")
   @Transactional
-  public ResponseEntity<List<ExpenseDTO>> getAllExpenses(@RequestParam(required = false) Long ctaegoryId, Pageable pageable){
-    List<ExpenseDTO> expenses = ctaegoryId == null
-      ? expenseService.getAllExpenses(pageable)
-      : expenseService.getAllExpensesByCategory(ctaegoryId,pageable);
+  public ResponseEntity<List<ExpenseDTO>> getAllExpenses(
+          @RequestParam(required = false)
+          Long categoryId,
+          @PageableDefault(page = 0,size = 20) Pageable pageable,
+          @RequestParam(required = false) OrderingType dateFilter,
+          @RequestParam(required = false) OrderingType priceFilter
+  ){
+    List<ExpenseDTO> expenses = categoryId == null
+      ? expenseService.getAllExpenses(pageable,dateFilter,priceFilter)
+      : expenseService.getAllExpensesByCategory(categoryId,dateFilter,priceFilter,pageable);
 
     return new ResponseEntity<>(expenses, HttpStatus.OK);
   }

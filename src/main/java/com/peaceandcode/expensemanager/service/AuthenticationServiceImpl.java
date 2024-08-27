@@ -32,7 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     newUser.setPassword(passwordEncoder.encode(user.getPassword()));
     newUser.setRole(Role.USER);
 
-    if(user.getEmail().equals(newUser.getEmail())){
+    if(userRepository.findByEmail(user.getEmail()).isPresent()){
       throw new BadRequestException("Username already exists");
     }
 
