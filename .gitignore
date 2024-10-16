@@ -37,5 +37,4 @@ build/
 /src/js/node_modules
 src/js/package-lock.json
 src/js/README.md
-src/main/java/com/peaceandcode/expensemanager/config/ApplicationConfig.java
 src/main/resources/application.properties
